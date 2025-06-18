@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Daily Sales Tracker - Eatery</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+<style>
+  /* Reset and base styles */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #f8eddb 0%, #f9f2e7 100%);
+    color: #5a3e1b;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  h1, h2, h3 {
+    margin: 0;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  button {
+    cursor: pointer;
+    border: none;
+  }
+  /* Container */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 16px 24px 64px;
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  /* Header */
+  header {
+    background-color: #e4b169;
+    color: #3f2f0b;
+    padding: 20px 24px;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  header h1 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    user-select: none;
+  }
+  /* Form */
+  form#salesForm {
+    background: #fff8f0;
+    border: 1px solid #f0d1a1;
+    border-radius: 12px;
+    padding: 24px 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 20px 32px;
+    align-items: end;
+  }
+  form label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #9b6b24;
+  }
+  form input[type="date"],
+  form input[type="text"],
+  form input[type="number"] {
+    font-size: 1rem;
+    padding: 10px 14px;
+    border: 1.5px solid #d9b571;
+    border-radius: 8px;
+    color: #5a3e1b;
+    background-color: #fff;
+    transition: border-color 0.3s ease;
+  }
+  form input[type="date"]:focus,
+  form input[type="text"]:focus,
+  form input[type="number"]:focus {
+    border-color: #c38000;
+    outline: none;
+    box-shadow: 0 0 6px #c38000aa;
+  }
+  form button[type="submit"] {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #d97e14 0%, #f8b334 100%);
+    color: #3b2804;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 12px 16px;
+    border-radius: 12px;
+    box-shadow: 0 5px 10px rgb(217 126 20 / 0.5);
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  form button[type="submit"]:hover,
+  form button[type="submit"]:focus {
+    background: linear-gradient(135deg, #f8b334 0%, #d97e14 100%);
+    outline: none;
+  }
+  form button[type="submit"] .material-icons {
+    font-size: 24px;
+  }
+  /* Sales Table */
+  section#salesTableSection {
+    background: #fff8f0;
+    border: 1px solid #f0d1a1;
+    border-radius: 12px;
+    padding: 24px 32px;
+  }
+  section#salesTableSection h2 {
+    font-weight: 700;
+    color: #9b6b24;
+    margin-bottom: 16px;
+  }
+  table#salesTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    color: #5a3e1b;
+  }
+  table#salesTable thead tr {
+    background: #f8c15b;
+    color: #3b2804;
+    text-transform: uppercase;
+  }
+  table#salesTable th,
+  table#salesTable td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0d1a1;
+    text-align: left;
+  }
+  table#salesTable tbody tr:hover {
+    background-color: #f8e4b6;
+  }
+  /* Total Sales */
+  #totalSales {
+    margin-top: 20px;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #b36500;
+    user-select: text;
+  }
+  /* Export Button */
+  #exportButtons {
+    margin-top: 28px;
+    display: flex;
+    gap: 16px;
+  }
+  button.export-btn {
+    background: linear-gradient(135deg, #f8b334 0%, #d97e14 100%);
+    color: #3b2804;
+    padding: 14px 28px;
+    font-weight: 700;
+    border-radius: 12px;
+    box-shadow: 0 5px 10px rgb(217 126 20 / 0.5);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+  }
+  button.export-btn:hover,
+  button.export-btn:focus {
+    background: linear-gradient(135deg, #d97e14 0%, #f8b334 100%);
+    outline: none;
+  }
+  button.export-btn .material-icons {
+    font-size: 24px;
+  }
+  /* Responsive */
+  @media (max-width: 640px) {
+    .container {
+      padding: 16px 16px 64px;
+    }
+    form#salesForm {
+      grid-template-columns: 1fr;
+    }
+    form button[type="submit"] {
+      grid-column: auto;
+      width: 100%;
+    }
+    #exportButtons {
+      flex-direction: column;
+    }
+    button.export-btn {
+      justify-content: center;
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+  <header role="banner">
+    <h1>Daily Sales Tracker</h1>
+  </header>
+  <main class="container" role="main" aria-label="Daily sales tracking application">
+
+    <form id="salesForm" aria-label="Add daily sales data">
+      <div>
+        <label for="date">Date</label>
+        <input type="date" id="date" required aria-required="true" />
+      </div>
+      <div>
+        <label for="day">Day</label>
+        <input type="text" id="day" placeholder="e.g., Monday" required aria-required="true"
+          pattern="^[a-zA-Z]+$" title="Please enter the day name only" autocomplete="off" />
+      </div>
+      <div>
+        <label for="total">Total Amount (₱)</label>
+        <input type="number" min="0" step="0.01" id="total" placeholder="0.00" required aria-required="true" />
+      </div>
+      <button type="submit" aria-label="Add daily sales">
+        Add Sales
+        <span class="material-icons" aria-hidden="true">add_circle</span>
+      </button>
+    </form>
+
+    <section id="salesTableSection" aria-live="polite" aria-atomic="true">
+      <h2>Daily Sales</h2>
+      <table id="salesTable" role="grid" aria-describedby="totalSales">
+        <thead>
+          <tr role="row">
+            <th role="columnheader" scope="col">Date</th>
+            <th role="columnheader" scope="col">Day</th>
+            <th role="columnheader" scope="col">Amount (₱)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Entries inserted dynamically here -->
+        </tbody>
+      </table>
+
+      <p id="totalSales" tabindex="0" aria-live="polite" aria-atomic="true">Total Sales: ₱0.00</p>
+
+      <div id="exportButtons">
+        <button class="export-btn" id="exportPdfBtn" aria-label="Export sales records to PDF">
+          <span class="material-icons" aria-hidden="true">picture_as_pdf</span> Export PDF
+        </button>
+        <button class="export-btn" id="exportExcelBtn" aria-label="Export sales records to Excel">
+          <span class="material-icons" aria-hidden="true">grid_on</span> Export Excel
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" integrity="sha512-Fr9WSfD3L0iRORZ1+ziaTV53dezP5rK38s1BFMYvI/n6a7YV5sf57JUxUHZAvsLhUOOS4ulsJ3AeMoyMYo2M2g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-WnpoFyaj0JDK5N/qXZ02vDMEiVtUzzwZ0zn0fwPaUi8siDtyvGqnVoCiCAz5mYsH/jrkLUJS6Yga33EPEJA4LA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+(() => {
+  const salesForm = document.getElementById('salesForm');
+  const salesTableBody = document.querySelector('#salesTable tbody');
+  const totalSalesDisplay = document.getElementById('totalSales');
+  const exportPdfBtn = document.getElementById('exportPdfBtn');
+  const exportExcelBtn = document.getElementById('exportExcelBtn');
+  const STORAGE_KEY = 'dailySalesData';
+
+  // Parse saved data or start fresh
+  let salesData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+  function saveToStorage() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(salesData));
+  }
+
+  function renderTable() {
+    salesTableBody.innerHTML = '';
+    if (salesData.length === 0) {
+      const noDataRow = document.createElement('tr');
+      const noDataCell = document.createElement('td');
+      noDataCell.colSpan = 3;
+      noDataCell.style.textAlign = 'center';
+      noDataCell.textContent = 'No sales data yet.';
+      noDataCell.setAttribute('aria-live', 'polite');
+      noDataRow.appendChild(noDataCell);
+      salesTableBody.appendChild(noDataRow);
+      totalSalesDisplay.textContent = 'Total Sales: ₱0.00';
+      return;
+    }
+    salesData.forEach(({ date, day, total }) => {
+      const row = document.createElement('tr');
+      const dateCell = document.createElement('td');
+      dateCell.textContent = new Date(date).toLocaleDateString(undefined, {year: 'numeric', month: 'short', day: 'numeric'});
+      const dayCell = document.createElement('td');
+      dayCell.textContent = day;
+      const totalCell = document.createElement('td');
+      totalCell.textContent = `₱${total.toFixed(2)}`;
+      row.append(dateCell, dayCell, totalCell);
+      salesTableBody.appendChild(row);
+    });
+
+    // Calculate total sales
+    const totalSales = salesData.reduce((acc, curr) => acc + curr.total, 0);
+    totalSalesDisplay.textContent = `Total Sales: ₱${totalSales.toFixed(2)}`;
+  }
+
+  function clearForm() {
+    salesForm.reset();
+    // Focus on date input for quick entry
+    salesForm.querySelector('#date').focus();
+  }
+
+  salesForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const dateValue = salesForm.date.value;
+    const dayValue = salesForm.day.value.trim();
+    const totalValue = parseFloat(salesForm.total.value);
+
+    if (!dateValue || !dayValue || isNaN(totalValue) || totalValue < 0) {
+      alert('Please fill out all fields with valid values.');
+      return;
+    }
+
+    // Avoid duplicate entry for same date and day
+    if (salesData.some(entry => (entry.date === dateValue && entry.day.toLowerCase() === dayValue.toLowerCase()))) {
+      if (!confirm('Entry for this date and day already exists. Add anyway?')) {
+        return;
+      }
+    }
+
+    salesData.push({
+      date: dateValue,
+      day: dayValue.charAt(0).toUpperCase() + dayValue.slice(1).toLowerCase(),
+      total: totalValue
+    });
+
+    saveToStorage();
+    renderTable();
+    clearForm();
+  });
+
+  function exportToExcel() {
+    if (salesData.length === 0) {
+      alert('No data to export.');
+      return;
+    }
+    const wsData = [
+      ['Date', 'Day', 'Amount (₱)'],
+      ...salesData.map(({ date, day, total }) => [
+        new Date(date).toLocaleDateString(),
+        day,
+        total
+      ])
+    ];
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, "Daily Sales");
+
+    XLSX.writeFile(wb, "daily_sales.xlsx");
+  }
+
+  async function exportToPDF() {
+    if (salesData.length === 0) {
+      alert('No data to export.');
+      return;
+    }
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+      unit: 'pt',
+      format: 'letter'
+    });
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(18);
+    pdf.text("Daily Sales Report", 40, 50);
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(12);
+
+    const columns = ["Date", "Day", "Amount (₱)"];
+    const rows = salesData.map(({ date, day, total }) => [
+      new Date(date).toLocaleDateString(),
+      day,
+      `₱${total.toFixed(2)}`
+    ]);
+
+    // Use autoTable plugin if available, else simple table
+    if (pdf.autoTable) {
+      pdf.autoTable({ head: [columns], body: rows, startY: 70 });
+    } else {
+      // Simple row render fallback
+      let y = 70;
+      pdf.text(columns.join(" | "), 40, y);
+      y += 20;
+      rows.forEach(row => {
+        pdf.text(row.join(" | "), 40, y);
+        y += 20;
+      });
+    }
+
+    pdf.save("daily_sales_report.pdf");
+  }
+
+  exportExcelBtn.addEventListener('click', exportToExcel);
+  exportPdfBtn.addEventListener('click', exportToPDF);
+
+  // On load render previous data
+  renderTable();
+})();
+</script>
+</body>
+</html>
+
